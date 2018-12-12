@@ -1,0 +1,20 @@
+﻿@model IEnumerable<ClothBazar.Entities.Category>
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+<div class="container">
+    
+    <div id="tableContainer">
+        @{
+            Html.RenderAction("CategoryTable");
+
+        }
+    </div>
+
+    <div id="actionContainer">
+
+    </div>
+</div>

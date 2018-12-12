@@ -1,0 +1,41 @@
+﻿@model Product
+@{
+    ViewBag.Title = "Delete";
+}
+
+
+
+
+<div style="background-color:#FFEBEE;padding:10px;border-radius:15px">
+    <br />
+    <div style="text-align:center">
+        <h3 style="color:red">Are You Sure To Delete ?</h3>
+
+        <h2 style="color:darkgreen">@Model.Name</h2>
+        <hr />
+        <button class="btn btn-danger" id="proDeleteBtn">Yes Delete</button>
+    </div>
+    <br />
+
+</div>
+<br />
+<script>
+    $('#proDeleteBtn').click(function () {
+
+
+        $.ajax({
+            type:'POST',
+            url: "/Product/Delete",
+            data: {
+               ID : @Model.ID
+            }
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+            $('#actionContainer').html(" ");
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+</script>

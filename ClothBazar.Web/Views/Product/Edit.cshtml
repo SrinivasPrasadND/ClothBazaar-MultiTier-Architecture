@@ -1,0 +1,132 @@
+﻿@model Product
+@{
+    ViewBag.Title = "Edit";
+    List<Category> categories = ViewBag.Cats;
+
+
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                Edit Product
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+
+<div class="row container">
+    <div class="col-6">
+        <form class="form-group" id="editfrom">
+
+            @Html.HiddenFor(x => x.ID)
+
+            <input type="hidden" value="@Model.ID" name="ProductId" />
+
+            @Html.LabelFor(x => x.Category)
+            <select name="CategoryID" class="form-control">
+                @foreach (var item in categories)
+                {
+                    <option value=@item.ID> @item.Name</option>
+                }
+            </select>
+            <br />
+
+            @Html.LabelFor(x => x.Name)
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            <br />
+            @Html.LabelFor(x => x.Description)
+            @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
+            <br />
+            @Html.LabelFor(x => x.Price)
+            @Html.TextBoxFor(x => x.Price, new { @class = "form-control" })
+            <br />
+
+            <label>Select An Image</label>
+            <input name="ImageUrl" type="hidden" id="ImageUrl" value="@Model.ImageUrl" />
+            <input type="file" id="imageUpload" accept=".png,.jpg,.jpeg" class="form-control" />
+            <br />
+
+            <input type="button" value="Update" id="proEditBtn" class=" btn-warning" />
+            <button type="button" id="cancelBtn" class=" btn-info col-3">Cancel</button>
+
+        </form>
+    </div>
+    <div class="col-2"></div>
+    <div class="col-4">
+        <img src="@Model.ImageUrl" width="400" height="300" id="categoryImage" />
+    </div>
+
+</div>
+<script>
+
+    $('#imageUpload').change(function () {
+
+        var element = this;
+
+        var formData = new FormData();
+
+        var totalFiles = element.files.length;
+        for (var i = 0; i < totalFiles; i++) {
+            var file = element.files[i];
+            formData.append("Photo", file);
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: "/Shared/UploadImage",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false
+        }).done(function (response) {
+            debugger;
+            console.log(response);
+            if (response.Success == true) {
+                $('#ImageUrl').val(response.ImageUrl);
+                $('#categoryImage').attr("src", response.ImageUrl);
+            }
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+
+
+    });
+
+
+    $('#proEditBtn').click(function () {
+
+
+        $.ajax({
+            type: 'POST',
+            url: "/Product/Edit",
+            data: $('#editfrom').serialize(),
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+            $('#actionContainer').html(" ");
+            DeFocus();
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    $('#cancelBtn').click(function () {
+        $('#actionContainer').html(" ");
+        $('html,body').animate({
+            scrollTop: $('#tableContainer').offset().top - 100
+        }, 1000);
+    });
+
+
+    function DeFocus() {
+        $('html,body').animate({
+            scrollTop: $('#mytable').offset().top - 100
+        }, 1000);
+    };
+
+</script>

@@ -1,0 +1,131 @@
+﻿@model List<Category>
+
+@{
+    ViewBag.Title = "Create";
+
+}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="title-section">
+                <h2 class="title">
+                    Create Product
+                </h2>
+            </div><!-- /.title-section -->
+        </div><!-- /.col-md-12 -->
+    </div><!-- /.row -->
+
+
+    <div class="container row">
+        <div class="col-6 col-md-offset-3">
+            <form class="form-group" id="createfrom">
+
+                <label>Category</label>
+                <select name="CategoryID" class="form-control">
+                    @foreach (var item in Model)
+                    {
+                        <option value="@item.ID">@item.Name</option>
+                    }
+                </select>
+                <br />
+
+
+                <label>Name</label>
+                <input name="Name" class="form-control" />
+                <br />
+
+                <label>Description</label>
+                <input name="Description" class="form-control" />
+                <br />
+
+                <label>Price</label>
+                <input name="Price" class="form-control" />
+                <br />
+
+                <label>Select An Image</label>
+                <input name="ImageUrl" type="hidden" id="ImageUrl" />
+                <input type="file" id="imageUpload" accept=".png,.jpg,.jpeg" class="form-control" />
+                <br />
+
+                <input type="button" value="Create" id="createBtn" class="btn btn-success" />
+                <button type="button" id="cancelBtn" class=" btn-info col-3">Cancel</button>
+
+            </form>
+        </div>
+        <div class="col-4">
+            <img src="~/Content/images/image-plcaeholder.png" width="400" height="400" id="categoryImage" style="float:left" />
+        </div>
+    </div>
+
+<hr />
+<script>
+
+    $('#imageUpload').change(function () {
+
+        var element = this;
+
+        var formData = new FormData();
+
+        var totalFiles = element.files.length;
+        for (var i = 0; i < totalFiles; i++) {
+            var file = element.files[i];
+            formData.append("Photo", file);
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: "/Shared/UploadImage",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false
+        }).done(function (response) {
+            debugger;
+            console.log(response);
+            if (response.Success == true) {
+                $('#ImageUrl').val(response.ImageUrl);
+                $('#categoryImage').attr("src", response.ImageUrl);
+            }
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+
+
+    });
+
+   
+    $('#createBtn').click(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: "/Product/Create",
+            data: $('#createfrom').serialize(),
+        }).done(function (response) {
+
+            $('#tableContainer').html(response);
+
+            $('#actionContainer').html(" ");
+            DeFocus();
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+     $('#cancelBtn').click(function () {
+         $('#actionContainer').html(" ");
+         $('html,body').animate({
+             scrollTop: $('#tableContainer').offset().top - 100
+         }, 1000);
+
+    });
+
+    function DeFocus() {
+        $('html,body').animate({
+            scrollTop: $('#mytable').offset().top - 100
+        }, 1000);
+    };
+
+</script>

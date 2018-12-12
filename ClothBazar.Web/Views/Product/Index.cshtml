@@ -1,0 +1,47 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="container">
+    <div id="tableContainer">
+        @*@{
+            Html.RenderAction("ProductsTable");
+
+        }*@
+    </div>
+    <hr />
+    <div id="actionContainer">
+
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <input type="button" id="prevtBtn" class="btn" value="Prev" />
+        </div>
+        <div class="col-8">
+          
+        </div>
+        <div class="col-2">
+            <input type="button" id="nextBtn" value="next" class="btn" />
+        </div>
+    </div>
+    <br />
+</div>
+<script>
+    (function () {
+
+        var pageCount = 2;
+        var pageurl = "/Product/ProductsTable/"+pageCount;
+        $.ajax({
+            type: 'GET',
+            url: pageurl,
+
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    })();
+    
+</script>

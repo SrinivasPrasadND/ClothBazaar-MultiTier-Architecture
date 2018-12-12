@@ -1,0 +1,128 @@
+﻿@model ClothBazar.Entities.Category
+@{
+    ViewBag.Title = "Edit";
+    var trueCheck = Model.IsFeatured ? "checked" : string.Empty;
+    var falseCheck = !Model.IsFeatured ? "checked" : string.Empty;
+
+    
+
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                Update Category
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-6">
+        <form method="post" id="categoryUpdateForm" class="form-group">
+
+            <input type="hidden" name="ID" value="@Model.ID" />
+
+            <label>Category Name</label>
+            <input name="Name" class="form-control" value="@Model.Name" />
+            <br />
+            <label>Description</label>
+            <input name="Description" class="form-control" value="@Model.Description" />
+            <br />
+            <label>Select An Image</label>
+            <input name="ImageUrl" type="hidden" id="ImageUrl" value="@Model.ImageUrl" />
+            <input type="file" id="imageUpload" accept=".png,.jpg,.jpeg" class="form-control" />
+
+            <br />
+            <div class="row">
+                <label><pre>   Is Featured?</pre></label>
+                <div class="col-1"><input name="IsFeatured" type="radio" value="True" @trueCheck class="form-control" /><label>True</label></div>
+                <div class="col-1"><input name="IsFeatured" type="radio" value="False" @falseCheck class="form-control" /><label>False</label></div>
+            </div>
+
+            <input type="button" id="updateBtn" value="Update" class=" btn-primary" />
+            <button type="button" id="cancelBtn" class=" btn-info ">Cancel</button>
+        </form>
+
+    </div>
+    <div class="col-2">
+
+    </div>
+    <div class="col-4">
+        <img src="@Model.ImageUrl" width="400" height="300" id="categoryImage"  />
+    </div>
+
+</div>
+
+<script>
+
+    $('#imageUpload').change(function () {
+
+        var element = this;
+
+        var formData = new FormData();
+
+        var totalFiles = element.files.length;
+        for (var i = 0; i < totalFiles; i++) {
+            var file = element.files[i];
+            formData.append("Photo", file);
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: "/Shared/UploadImage",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false
+        }).done(function (response) {
+            debugger;
+            console.log(response);
+            if (response.Success == true) {
+                $('#ImageUrl').val(response.ImageUrl);
+                $('#categoryImage').attr("src", response.ImageUrl);
+            }
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+
+
+    });
+
+
+    $('#updateBtn').click(function () {
+
+
+        $.ajax({
+            type:'POST',
+            url: "/Category/Edit",
+            data: $('#categoryUpdateForm').serialize(),
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+            $('#actionContainer').html(" ");
+            DeFocus();
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    $('#cancelBtn').click(function () {
+        $('#actionContainer').html(" ");
+        $('html,body').animate({
+            scrollTop: $('#tableContainer').offset().top - 100
+        }, 1000);
+
+    });
+
+    function DeFocus() {
+        $('html,body').animate({
+            scrollTop: $('#mytable').offset().top - 100
+        }, 1000);
+    };
+
+</script>

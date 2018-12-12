@@ -1,0 +1,190 @@
+﻿@model IEnumerable<Category>
+@{
+    ViewBag.Title = "CategoryTable";
+}
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                CategoryTable
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+<div class="row">
+    <div class="col-6">
+
+        <form method="post" class="form-group row">
+
+            <input id="searchTxt" name="search" class="form-control col-6" placeholder="Search">
+            <button type="button" class=" btn-primary col-1" id="searchBtn"><img src="~/Content/icon/search.png" width="20" height="20" /></button>
+
+        </form>
+    </div>
+    <div class="col-4">
+
+    </div>
+    <div class="col-2">
+        <button type="button" id="newBtn" class=" btn-success ">ADD</button>
+
+    </div>
+
+    <br />
+
+
+</div>
+<br />
+<div>
+    <table class="table table-striped" id="mytable" style="text-align-last:center">
+        <thead>
+            <tr class="text-primary" style="background-color:#BBDEFD">
+                <th><b>Category Name</b></th>
+                <th><b>Is Featured</b></th>
+
+                <th><b>Number Of Products</b></th>
+                <th><b>Despcription</b></th>
+                <th><b>Action</b></th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        @item.IsFeatured
+                    </td>
+                    <td>
+                        @item.Products.Count
+                    </td>
+                    <td>@item.Description</td>
+                    <td>
+                        <button class="btn-warning btn-sm editBtn" id="@item.ID">Edit</button>
+                        <button class=" btn-danger btn-sm catdeleteBtn" id="@item.ID">Delete</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+
+<hr />
+<script>
+    //advance search
+    $('#searchTxt').keyup(function () {
+        var searchValue = $('#searchTxt').val();
+
+        $.ajax({
+            url: "/Category/CategoryTable",
+            data: { search: searchValue }
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    //search
+    $('#searchBtn').click(function () {
+        var searchValue = $('#searchTxt').val();
+
+        $.ajax({
+            url: '@Url.Action("CategoryTable", "Category")', //"/Category/CategoryTable",
+            data: { search: searchValue }
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    /////Create Button
+
+    $('#newBtn').click(function () {
+
+        $.ajax({
+            type: 'GET',
+            url: "/Category/Create",
+
+        }).done(function (response) {
+            $('#actionContainer').html(response);
+            AutoFocus();
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+
+    ///Edit Button
+    $('.editBtn').click(function () {
+
+        $.ajax({
+            url: "/Category/Edit",
+            data: {
+                ID: $(this).attr('id')
+            }
+        }).done(function (response) {
+            $('#actionContainer').html(response);
+            AutoFocus();
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    //Delete Button
+
+    $('.catdeleteBtn').click(function () {
+
+        swal({
+            title: "Confirm!",
+            text: "Are You Sure To Delete The Category?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "/Category/Delete",
+                        data: {
+                            ID: $(this).attr('id')
+                        }
+
+                    }).done(function (response) {
+                        $('#tableContainer').html(response);
+
+                        swal("Selected Category has been deleted!", {
+                            icon: "success",
+                        });
+
+                    }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Failure")
+                    });
+
+                } else {
+                    swal("Your Category file is safe!");
+                }
+            });
+
+
+
+
+    });
+
+    function AutoFocus() {
+        $('html,body').animate({
+            scrollTop: $('#actionContainer').offset().top - 100
+        }, 1000);
+    };
+
+
+
+</script>

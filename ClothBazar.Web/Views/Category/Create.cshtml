@@ -1,0 +1,117 @@
+﻿
+@{
+    ViewBag.Title = "Create";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                Create Category
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+<div class="row container">
+    <div class="col-6">
+
+        <form method="post" id="categoryCreteForm" class="form-group">
+            <label>Category Name</label>
+            <input name="Name" class="form-control" />
+            <br />
+            <label>Description</label>
+            <input name="Description" class="form-control" />
+            <br />
+            <label>Select An Image</label>
+            <input name="ImageUrl" type="hidden" id="ImageUrl" />
+            <input type="file" id="imageUpload" accept=".png,.jpg,.jpeg" class="form-control" />
+            <br />
+
+            <div class="row">
+                <label><pre>   Is Featured?</pre></label>
+                <div class="col-1"> <input name="IsFeatured" type="radio" value="True" /><label>True</label></div>
+                <div class="col-1"> <input name="IsFeatured" type="radio" value="False" /><label>False  </label></div>
+
+            </div>
+
+            <input type="button" value="Create" id="fromCreateBtn" class="btn-success" />
+            <button type="button" id="cancelBtn" class=" btn-info ">Cancel</button>
+        </form>
+    </div>
+    <div class="col-2"></div>
+    <div class="col-4"  >
+        <img src="~/Content/images/image-plcaeholder.png" width="400" height="400" id="categoryImage" style="float:left" />
+    </div>
+</div>
+
+<script>
+
+    $('#imageUpload').change(function () {
+
+        var element = this;
+
+        var formData = new FormData();
+
+        var totalFiles = element.files.length;
+        for (var i = 0; i < totalFiles; i++) {
+            var file = element.files[i];
+            formData.append("Photo", file);
+        }
+
+
+        $.ajax({
+            type: 'POST',
+            url: "/Shared/UploadImage",
+            data: formData,
+            dataType: 'json',
+            contentType: false,
+            processData: false
+        }).done(function (response) {
+            debugger;
+            console.log(response);
+            if (response.Success == true) {
+                $('#ImageUrl').val(response.ImageUrl);
+                $('#categoryImage').attr("src", response.ImageUrl);
+            }
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+
+
+    });
+
+    $('#fromCreateBtn').click(function () {
+
+        $.ajax({
+            type: 'POST',
+            url: "/Category/Create",
+            data: $('#categoryCreteForm').serialize(),
+        }).done(function (response) {
+
+
+            $('#tableContainer').html(response);
+
+            $('#actionContainer').html(" ");
+            DeFocus(); 
+
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    $('#cancelBtn').click(function () {
+        $('#actionContainer').html(" ");
+        $('html,body').animate({
+            scrollTop: $('#tableContainer').offset().top - 100
+        }, 1000);
+
+    });
+
+    function DeFocus() {
+        $('html,body').animate({
+            scrollTop: $('#mytable').offset().top - 100
+        }, 1000);
+    };
+</script>

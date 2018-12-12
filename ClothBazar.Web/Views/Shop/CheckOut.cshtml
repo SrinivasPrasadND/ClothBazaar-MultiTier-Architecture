@@ -1,0 +1,93 @@
+﻿@model ClothBazar.Web.ViewModels.CheckOutViewmodels
+@{
+    ViewBag.Title = "CheckOut";
+    decimal totalBill = 0;
+}
+
+<style>
+    h3{
+        color:darkslateblue;
+    }
+</style>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                CheckOut
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+<div class="container" style="border:solid 2px #f63440;padding:30px">
+
+    @if (Model != null)
+    {
+        if (Model.CartProducts != null && Model.CartProducts.Count > 0)
+        {
+            <div>
+                @foreach (var item in Model.CartProducts)
+                {
+                    var productQuatity = Model.CartProductIds.Where(x => x == item.ID).Count();
+                    totalBill += (productQuatity * item.Price);
+
+
+                <div class="row" style="text-align:center">
+                    <div class="col-3">
+                        <img src="@item.ImageUrl" width="200" height="200" />
+                    </div>
+                    <div class="col-2">
+                        <h3>Product Name</h3>
+                        <hr />
+                        <br /> <h4>@item.Name</h4>
+                    </div>
+                    <div class="col-2">
+                        <h3>Price</h3>  <hr />
+                        <br /><h4> @item.Price</h4>
+                    </div>
+                    <div class="col-1">
+                        <h3> <pre> </pre></h3>
+                        <hr />
+                        <br /><h3>*</h3>
+                    </div>
+                    <div class="col-2">
+                        <h3>Quantity</h3>  <hr />
+                        <br /> <h4>@productQuatity</h4>
+                    </div>
+                    <div class="col-2">
+                        <h3>Total</h3>  <hr />
+                        <br />
+                       <h4> @(item.Price * productQuatity)</h4>
+                    </div>
+                </div>
+                    <hr />
+                }
+            </div>
+
+            <div class="row" >
+                <div class="col-9"></div>
+                <div class="col-3" style="text-align:right;padding:5px">
+                    <h3 style="color:cadetblue">Tax : $5 </h3>
+                    <h3 style="color:cadetblue">Shipping charge : $2</h3>
+                    <hr />
+                    <h3 style="color:crimson">Total Bill : $@totalBill</h3>
+                </div>
+            </div>
+
+        }
+        else
+        {
+            <div class="row" >
+                <div class="col-md-12">
+                    <div class="title-section">
+                        <h3>
+                            No Products in Your Cart
+                        </h3>
+                    </div><!-- /.title-section -->
+                </div><!-- /.col-md-12 -->
+            </div><!-- /.row -->
+        }
+    }
+</div>
+<br />

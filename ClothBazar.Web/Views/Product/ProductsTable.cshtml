@@ -1,0 +1,187 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewBag.Title = "ProductsTable";
+}
+
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <div class="title-section">
+            <h2 class="title">
+                Products Table
+            </h2>
+        </div><!-- /.title-section -->
+    </div><!-- /.col-md-12 -->
+</div><!-- /.row -->
+
+
+<div class="row">   
+    <div class="col-6">
+
+        <form method="post" class="form-group row">
+
+            <input id="searchTxt" name="search" class="form-control col-6" placeholder="Search">
+            <button type="button" class=" btn-primary col-1" id="searchBtn"><img src="~/Content/icon/search.png" width="20" height="20" /></button>
+
+        </form>
+    </div>
+    <div class="col-4"></div>
+    <div class="col-2">
+        <button type="button" id="newBtn" class=" btn-success">ADD</button>
+       
+    </div>
+
+    <br />
+
+
+</div>
+<br />
+<div>
+    <table class=" table table-striped" id="mytable" style="text-align-last:center">
+        <thead>
+            <tr class="text-primary" style="background-color:#BBDEFD">
+
+                <th><b>Product Name</b></th>
+                <th><b>Category</b></th>
+                <th><b>Price In $</b></th>
+                <th><b>Action</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>
+                        @if (item.Category != null)
+                        {
+                            <text>@item.Category.Name</text>
+                        }
+                        else
+                        {
+                            <text>-</text>
+                        }
+                    </td>
+                    <td>@item.Price</td>
+                    <td>
+                        <button class=" btn-warning btn-sm editBtn" id="@item.ID">Edit</button>
+                        <button class=" btn-danger btn-sm deleteBtn" id="@item.ID">Delete</button>
+                        <button class=" btn-info btn-sm addToCart" id="@item.ID">Add To Cart</button>
+                    </td>
+                </tr>
+
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    $('#searchBtn').click(function () {
+        var searchValue = $('#searchTxt').val();
+
+        $.ajax({
+            url: "/Product/ProductsTable",
+            data: { search: searchValue }
+        }).done(function (response) {
+            $('#tableContainer').html(response);
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+    /////Create Button
+
+    $('#newBtn').click(function () {
+
+        $.ajax({
+            type: 'GET',
+            url: "/Product/Create",
+
+        }).done(function (response) {
+            $('#actionContainer').html(response);
+            AutoFocus();
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+
+   
+
+    ///Edit Button
+    $('.editBtn').click(function () {
+
+        $.ajax({
+            url: "/Product/Edit",
+            data: {
+                ID: $(this).attr('id')
+            }
+        }).done(function (response) {
+            $('#actionContainer').html(response);
+            AutoFocus();
+        }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+            alert("Failure")
+        });
+    });
+
+
+    //Add to Cart
+    var products = [];
+    $('.addToCart').click(function () {
+
+        var productId = $(this).attr('id')
+        products.push(productId);
+        $.cookie('CartProducts', products.join('-'), { path: '/' });
+        alert("Product added to cart");
+
+    });
+
+    //Delete Button
+    $('.deleteBtn').click(function () {
+
+        swal({
+            title: "Confirm!",
+            text: "Are you sure to delete the Product?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+
+                    $.ajax({
+                        type: 'POST',
+                        url: "/Product/Delete",
+                        data: {
+                            ID: $(this).attr('id')
+                        }
+
+                    }).done(function (response) {
+                        $('#tableContainer').html(response);
+
+                        swal("Selected file has been deleted!", {
+                            icon: "success",
+                        });
+                        
+                    }).fail(function (XMLHttpRequest, textStatus, errorThrown) {
+                        alert("Failure")
+                    });
+
+
+                } else {
+                    swal("Your Product is safe!");
+                }
+            });
+
+
+    });
+
+
+    function AutoFocus() {
+        $('html,body').animate({
+            scrollTop: $('#actionContainer').offset().top - 100
+        }, 1000)
+    };
+
+</script>
